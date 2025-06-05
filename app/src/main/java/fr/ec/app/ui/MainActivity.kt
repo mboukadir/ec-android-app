@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val list = this.findViewById<RecyclerView>(R.id.list_item)
         list.adapter = PostAdapter(dataSource = DataProvider.getPosts())
-        list.layoutManager = LinearLayoutManager(this)
+        list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
     }
 
 
