@@ -16,16 +16,26 @@ import fr.ec.app.data.Post
 
 //  class MainActivity: Activity()
 class MainActivity : AppCompatActivity() {
-
+    private val adapter = PostAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         setupWindowInsetsListener()
+        setupRecyclerView()
 
+        DataProvider.getPosts( onResponse = { posts ->
+            runOnUiThread {
+                adapter.show(posts)
+            }
+        })
+
+    }
+
+    private fun setupRecyclerView() {
         val list = this.findViewById<RecyclerView>(R.id.list_item)
-        list.adapter = PostAdapter(dataSource = DataProvider.getPosts())
-        list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+        list.adapter = adapter
+        list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
 

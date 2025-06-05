@@ -11,8 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.ec.app.R
 import fr.ec.app.data.Post
 
-class PostAdapter(private val dataSource: List<Post>) : RecyclerView.Adapter<PostViewHolder>() {
+class PostAdapter() : RecyclerView.Adapter<PostViewHolder>() {
 
+    private val dataSource = mutableListOf<Post>()
+
+    fun show(posts : List<Post>) {
+        dataSource.addAll(posts)
+        notifyDataSetChanged()
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
