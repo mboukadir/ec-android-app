@@ -1,18 +1,26 @@
 package fr.ec.app.ui
 
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.util.Log
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.ec.app.R
 import fr.ec.app.data.DataProvider
-import fr.ec.app.data.Post
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 //  class MainActivity: Activity()
 class MainActivity : AppCompatActivity() {
@@ -23,13 +31,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupWindowInsetsListener()
         setupRecyclerView()
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
-        DataProvider.getPosts( onResponse = { posts ->
-            runOnUiThread {
-                adapter.show(posts)
+        lifecycleScope.launch {
+            // Main Thread
+            progressBar.isVisible = true
+           val result = DataProvider.getPosts()
+
+            when(result) {
+                DataProvider.Result.Failure -> {
+                    progressBar.isVisible = false
+                }
+                is DataProvider.Result.Success -> {
+                        adapter.show(result.posts)
+                        progressBar.isVisible = false
+
+                }
             }
-        })
+        }
+        // log
 
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     private fun setupRecyclerView() {

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuView
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import fr.ec.app.R
 import fr.ec.app.data.Post
 
@@ -61,9 +62,10 @@ class PostViewHolder(
 
     fun bind(post: Post) {
         // biding
+        Picasso.get().load(post.image)
+            .placeholder(R.mipmap.ic_launcher)
+            .into(postImageView)
         titleTextView.text = post.title
         subtitleTextView.text = post.subtitle
-        postImageView.setImageResource(post.image)
-
     }
 }

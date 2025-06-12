@@ -1,6 +1,7 @@
 package fr.ec.app.data.api
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * ---
@@ -18,10 +19,11 @@ import com.squareup.moshi.Json
  *     }]
  *   }
  */
+@JsonClass(generateAdapter = true)
 data class PostsResponse(
     val posts: List<PostResponse>
 )
-
+@JsonClass(generateAdapter = true)
 data class PostResponse(
     val id: String,
     @Json(name = "name")
@@ -31,5 +33,5 @@ data class PostResponse(
     val votesCount:Int,
     val commentsCount: Int
 )
-
+@JsonClass(generateAdapter = true)
 data class Thumbnail(val url: String)
