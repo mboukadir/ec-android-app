@@ -58,4 +58,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
     kapt(libs.moshi.kotlin.codegen)
+    implementation(libs.room.runtime)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
 }

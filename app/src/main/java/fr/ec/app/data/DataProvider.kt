@@ -1,16 +1,21 @@
 package fr.ec.app.data
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import android.content.Context
+import android.util.Log
+import androidx.room.Room
 import fr.ec.app.data.api.PostsResponse
 import fr.ec.app.data.api.PostsService
+import fr.ec.app.data.database.AppDataBase
+import fr.ec.app.data.database.entities.PostEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 
-object DataProvider {
+class DataProvider(
+    val context: Context
+) {
     private val BASE_URL =
         "https://raw.githubusercontent.com/mboukadir/ec-android-app/refs/heads/main/data/"
 
@@ -19,6 +24,13 @@ object DataProvider {
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
 
+    private val database: AppDataBase = Room.databaseBuilder(
+        context = context,
+        klass = AppDataBase::class.java,
+        name = "database-name"
+    ).build()
+
+
     private val service: PostsService = retrofit.create(PostsService::class.java)
 
 
@@ -26,14 +38,38 @@ object DataProvider {
 
         try {
             val postsResponse = service.getPost()
-            Result.Success(
-                posts = postsResponse.map()
-            )
-
+            save(postsResponse)
+            Result.Success(postsResponse.map())
         } catch (e: Exception) {
-            Result.Failure
+            Log.e("PostRepository", "Error fetching posts from service", e)
+
+            val postEntities = database.postDao().getPosts()
+            if (postEntities.isEmpty()) {
+                Result.Failure
+            } else {
+                Result.Success(posts = postEntities.map {
+                    Post(
+                        title = it.title,
+                        subtitle = it.subtitle,
+                        image = it.image
+                    )
+                })
+            }
         }
 
+    }
+
+    private fun save(postsResponse: PostsResponse) {
+        val postEntities = postsResponse.posts.map {
+            PostEntity(
+                id = it.id,
+                title = it.title,
+                subtitle = it.tagline,
+                image = it.thumbnail.url
+            )
+        }
+
+        database.postDao().insert(postEntities)
     }
 
     private fun PostsResponse?.map(): List<Post> = this?.posts.orEmpty().map { postResponse ->

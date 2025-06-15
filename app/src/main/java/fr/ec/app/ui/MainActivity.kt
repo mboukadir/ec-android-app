@@ -32,11 +32,12 @@ class MainActivity : AppCompatActivity() {
         setupWindowInsetsListener()
         setupRecyclerView()
         val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        val dataProvider = DataProvider(this.application)
 
         lifecycleScope.launch {
             // Main Thread
             progressBar.isVisible = true
-           val result = DataProvider.getPosts()
+           val result = dataProvider.getPosts()
 
             when(result) {
                 DataProvider.Result.Failure -> {
